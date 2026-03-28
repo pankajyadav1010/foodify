@@ -1,0 +1,182 @@
+[
+  {
+    "id": "1",
+    "name": "Paneer Butter Masala",
+    "category": "Indian",
+    "price": 250,
+    "rating": 4.5,
+    "image": "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=400&h=300&fit=crop",
+    "description": "Rich and creamy paneer cubes simmered in a velvety butter tomato gravy. A true North Indian classic."
+  },
+  {
+    "id": "2",
+    "name": "Chicken Biryani",
+    "category": "Indian",
+    "price": 320,
+    "rating": 4.8,
+    "image": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400&h=300&fit=crop",
+    "description": "Fragrant basmati rice layered with tender spiced chicken, saffron, and caramelized onions. Dum-cooked to perfection."
+  },
+  {
+    "id": "3",
+    "name": "Dal Makhani",
+    "category": "Indian",
+    "price": 220,
+    "rating": 4.3,
+    "image": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop",
+    "description": "Slow-cooked black lentils in a buttery, creamy sauce with aromatic spices. Comfort food at its finest."
+  },
+  {
+    "id": "4",
+    "name": "Butter Chicken",
+    "category": "Indian",
+    "price": 300,
+    "rating": 4.7,
+    "image": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400&h=300&fit=crop",
+    "description": "Succulent tandoori chicken pieces swimming in a luscious, mildly spiced tomato-butter sauce."
+  },
+  {
+    "id": "5",
+    "name": "Veg Hakka Noodles",
+    "category": "Chinese",
+    "price": 180,
+    "rating": 4.2,
+    "image": "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=300&fit=crop",
+    "description": "Stir-fried noodles tossed with crunchy vegetables, soy sauce, and a hint of chilli. Street-style perfection."
+  },
+  {
+    "id": "6",
+    "name": "Chicken Manchurian",
+    "category": "Chinese",
+    "price": 260,
+    "rating": 4.4,
+    "image": "https://images.unsplash.com/photo-1525755662778-989d0524087e?w=400&h=300&fit=crop",
+    "description": "Crispy chicken bites coated in a tangy, spicy Indo-Chinese manchurian sauce with spring onions."
+  },
+  {
+    "id": "7",
+    "name": "Veg Fried Rice",
+    "category": "Chinese",
+    "price": 170,
+    "rating": 4.1,
+    "image": "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop",
+    "description": "Fluffy rice wok-tossed with fresh vegetables, garlic, and soy sauce. Quick, filling, and delicious."
+  },
+  {
+    "id": "8",
+    "name": "Classic Veg Burger",
+    "category": "Fast Food",
+    "price": 150,
+    "rating": 4.0,
+    "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=300&fit=crop",
+    "description": "Crunchy veggie patty loaded with lettuce, tomato, cheese, and our signature mayo in a toasted bun."
+  },
+  {
+    "id": "9",
+    "name": "Chicken Burger",
+    "category": "Fast Food",
+    "price": 199,
+    "rating": 4.3,
+    "image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
+    "description": "Juicy grilled chicken fillet with smoky BBQ sauce, pickles, and melted cheese. An absolute crowd-pleaser."
+  },
+  {
+    "id": "10",
+    "name": "French Fries",
+    "category": "Fast Food",
+    "price": 99,
+    "rating": 4.2,
+    "image": "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&h=300&fit=crop",
+    "description": "Golden, crispy fries seasoned with peri-peri spice and served with cheesy dip. Irresistibly crunchy."
+  },
+  {
+    "id": "11",
+    "name": "Pepperoni Pizza",
+    "category": "Fast Food",
+    "price": 350,
+    "rating": 4.6,
+    "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop",
+    "description": "Loaded with spicy pepperoni, mozzarella cheese, and Italian herbs on a hand-tossed crust."
+  },
+  {
+    "id": "12",
+    "name": "Masala Dosa",
+    "category": "South Indian",
+    "price": 120,
+    "rating": 4.5,
+    "image": "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=400&h=300&fit=crop",
+    "description": "Crispy golden crepe stuffed with spiced potato filling, served with coconut chutney and sambar."
+  },
+  {
+    "id": "13",
+    "name": "Idli Sambar",
+    "category": "South Indian",
+    "price": 80,
+    "rating": 4.1,
+    "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400&h=300&fit=crop",
+    "description": "Soft, fluffy steamed rice cakes served with piping hot sambar and fresh chutneys. Light and wholesome."
+  },
+  {
+    "id": "14",
+    "name": "Medu Vada",
+    "category": "South Indian",
+    "price": 90,
+    "rating": 4.0,
+    "image": "https://images.unsplash.com/photo-1630383249896-424e482df921?w=400&h=300&fit=crop",
+    "description": "Crispy and golden urad dal fritters with a fluffy center, paired with sambar and coconut chutney."
+  },
+  {
+    "id": "15",
+    "name": "Cold Coffee",
+    "category": "Beverages",
+    "price": 130,
+    "rating": 4.4,
+    "image": "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=300&fit=crop",
+    "description": "Chilled creamy coffee blended with milk and ice cream. The ultimate refresher on a hot day."
+  },
+  {
+    "id": "16",
+    "name": "Mango Lassi",
+    "category": "Beverages",
+    "price": 110,
+    "rating": 4.3,
+    "image": "https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=400&h=300&fit=crop",
+    "description": "Thick and creamy yogurt smoothie blended with sweet Alphonso mangoes. A tropical delight."
+  },
+  {
+    "id": "17",
+    "name": "Fresh Lime Soda",
+    "category": "Beverages",
+    "price": 60,
+    "rating": 3.9,
+    "image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400&h=300&fit=crop",
+    "description": "Zesty lime juice with soda, a pinch of salt, and crushed ice. Refreshing and tangy in every sip."
+  },
+  {
+    "id": "18",
+    "name": "Gulab Jamun",
+    "category": "Desserts",
+    "price": 100,
+    "rating": 4.6,
+    "image": "https://images.unsplash.com/photo-1666190064340-5c685048e107?w=400&h=300&fit=crop",
+    "description": "Soft, melt-in-mouth milk dumplings soaked in warm rose-flavored sugar syrup. Pure indulgence."
+  },
+  {
+    "id": "19",
+    "name": "Chocolate Brownie",
+    "category": "Desserts",
+    "price": 160,
+    "rating": 4.7,
+    "image": "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=400&h=300&fit=crop",
+    "description": "Dense, fudgy chocolate brownie with a gooey center, topped with vanilla ice cream and hot fudge."
+  },
+  {
+    "id": "20",
+    "name": "Rasmalai",
+    "category": "Desserts",
+    "price": 140,
+    "rating": 4.5,
+    "image": "https://images.unsplash.com/photo-1573246123716-6b1782bfc499?w=400&h=300&fit=crop",
+    "description": "Silky soft paneer discs soaked in chilled, cardamom-infused sweet milk topped with pistachios."
+  }
+]

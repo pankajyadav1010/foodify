@@ -1,0 +1,181 @@
+/* App.css - Global styles for Foodify application */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+/* CSS Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary: #e94560;
+  --primary-dark: #c0392b;
+  --bg-dark: #0d1117;
+  --bg-card: #161b22;
+  --bg-input: #1e2a3a;
+  --border: #21262d;
+  --text-muted: rgba(255, 255, 255, 0.5);
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: var(--bg-dark);
+  color: #ffffff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: #30363d;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* ─── Form Controls ─── */
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+.form-control:focus {
+  box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2) !important;
+  background: #1e2a3a !important;
+  color: white !important;
+  border-color: var(--primary) !important;
+}
+.form-select:focus {
+  box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.2) !important;
+  border-color: var(--primary) !important;
+}
+.form-control.is-invalid {
+  border-color: var(--primary) !important;
+}
+.invalid-feedback {
+  color: var(--primary) !important;
+  font-size: 0.78rem;
+}
+
+/* ─── Input group ─── */
+.input-group-text {
+  color: var(--primary);
+}
+
+/* ─── Buttons ─── */
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  transition: all 0.2s;
+}
+.btn:active {
+  transform: translateY(0);
+}
+
+/* ─── Cards ─── */
+.food-card:hover {
+  transform: translateY(-8px) !important;
+}
+
+/* ─── Spinner animation ─── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ─── Navbar dropdown ─── */
+.navbar-nav .dropdown-menu {
+  background: #161b22;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.navbar-nav .dropdown-item {
+  color: rgba(255, 255, 255, 0.7);
+}
+.navbar-nav .dropdown-item:hover {
+  background: rgba(233, 69, 96, 0.1);
+  color: var(--primary);
+}
+
+/* ─── Alert override ─── */
+.alert {
+  border-radius: 10px;
+}
+
+/* ─── Table dark theme ─── */
+.table {
+  color: white;
+}
+.table thead th {
+  border-bottom: 1px solid var(--border) !important;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Modal Overlay ─── */
+.modal-overlay {
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ─── Loading shimmer ─── */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #161b22 25%, #1e2a3a 50%, #161b22 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* ─── Link overrides ─── */
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: none;
+}
+
+/* ─── Bootstrap dark form overrides ─── */
+.form-control,
+.form-select,
+.input-group-text {
+  background-color: var(--bg-input) !important;
+  color: white !important;
+  border: none !important;
+}
+.form-select option {
+  background-color: var(--bg-input);
+}
+
+/* ─── Sticky top offset ─── */
+.sticky-top {
+  z-index: 100;
+}

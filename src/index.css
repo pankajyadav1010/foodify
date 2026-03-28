@@ -1,0 +1,9 @@
+/* index.css - Minimal base reset (main styles are in App.css) */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: #0d1117;
+}
