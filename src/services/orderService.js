@@ -9,6 +9,7 @@ import {
   orderBy,
   where,
   serverTimestamp,
+  onSnapshot
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -115,4 +116,40 @@ export const updateOrderStatus = async (orderId, newStatus) => {
     status: newStatus,
     updatedAt: serverTimestamp(),
   });
+};
+
+/**
+ * Listen to user's orders in real-time
+ */
+export const listenToUserOrders = (userId, callback) => {
+  const q = query(
+    collection(db, ORDERS_COLLECTION),
+    where("userId", "==", userId)
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const orders = snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+
+    orders.sort((a, b) => {
+      const timeA = a.createdAt?.seconds || 0;
+      const timeB = b.createdAt?.seconds || 0;
+      return timeB - timeA;
+    });
+
+    callback(orders);
+  }, (error) => {
+    console.error("Error listening to orders:", error);
+    callback([]);
+  });
+};
+
+/**
+ * Update delivery partner and location data for an order
+ */
+export const updateOrderDeliveryData = async (orderId, data) => {
+  const orderRef = doc(db, ORDERS_COLLECTION, orderId);
+  await updateDoc(orderRef, data);
 };

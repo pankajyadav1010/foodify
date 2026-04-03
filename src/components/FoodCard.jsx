@@ -1,4 +1,4 @@
-// FoodCard.jsx - Displays individual food item with add to cart button
+// FoodCard.jsx - Food item card with gradient accents and hover animations
 import React from "react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
@@ -11,7 +11,6 @@ const FoodCard = ({ item }) => {
   const { currentUser, userRole } = useAuth();
   const navigate = useNavigate();
 
-  // Generate a random rating for display
   const rating = item.rating || (3.5 + Math.random() * 1.5).toFixed(1);
 
   const handleAddToCart = () => {
@@ -25,13 +24,13 @@ const FoodCard = ({ item }) => {
 
   // Category color map
   const categoryColors = {
-    Indian: "#e94560",
-    Chinese: "#f39c12",
-    "Fast Food": "#e67e22",
-    "South Indian": "#27ae60",
-    Beverages: "#3498db",
-    Desserts: "#9b59b6",
-    default: "#e94560",
+    Indian: "#ef4444",
+    Chinese: "#f97316",
+    "Fast Food": "#eab308",
+    "South Indian": "#22c55e",
+    Beverages: "#3b82f6",
+    Desserts: "#a855f7",
+    default: "#ef4444",
   };
 
   const categoryColor = categoryColors[item.category] || categoryColors.default;
@@ -39,22 +38,13 @@ const FoodCard = ({ item }) => {
   return (
     <div className="col-12 col-sm-6 col-md-4 col-xl-3 mb-4">
       <div
-        className="card h-100 border-0 food-card"
+        className="card h-100 border-0 food-card fade-in-up"
         style={{
           borderRadius: "16px",
           overflow: "hidden",
-          background: "#1e2a3a",
+          background: "#161b22",
           boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-          transition: "all 0.3s ease",
           cursor: "pointer",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "translateY(-8px)";
-          e.currentTarget.style.boxShadow = "0 12px 40px rgba(233,69,96,0.3)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.2)";
         }}
       >
         {/* Food Image */}
@@ -62,18 +52,33 @@ const FoodCard = ({ item }) => {
           <img
             src={item.image || `https://source.unsplash.com/400x300/?${item.name},food`}
             alt={item.name}
-            className="card-img-top"
-            style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.4s ease" }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            className="card-img-top food-card-img"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
             onError={(e) => {
-              e.target.src = `https://via.placeholder.com/400x300/1e2a3a/e94560?text=${encodeURIComponent(item.name)}`;
+              e.target.src = `https://via.placeholder.com/400x300/1e2a3a/ef4444?text=${encodeURIComponent(item.name)}`;
+            }}
+          />
+          {/* Gradient overlay at bottom of image */}
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: "50px",
+              background: "linear-gradient(transparent, #161b22)",
             }}
           />
           {/* Category badge */}
           <span
             className="badge position-absolute top-0 end-0 m-2"
-            style={{ background: categoryColor, fontSize: "0.7rem", padding: "5px 10px", borderRadius: "20px" }}
+            style={{
+              background: categoryColor,
+              fontSize: "0.7rem",
+              padding: "5px 12px",
+              borderRadius: "20px",
+              boxShadow: `0 2px 10px ${categoryColor}40`,
+            }}
           >
             {item.category}
           </span>
@@ -87,39 +92,37 @@ const FoodCard = ({ item }) => {
 
           {/* Rating */}
           <div className="d-flex align-items-center mb-2">
-            <FiStar size={13} style={{ color: "#f1c40f", fill: "#f1c40f" }} />
+            <FiStar size={13} style={{ color: "#f59e0b", fill: "#f59e0b" }} />
             <span className="ms-1 text-white-50" style={{ fontSize: "0.8rem" }}>{rating}</span>
           </div>
 
           {/* Description */}
           {item.description && (
-            <p className="card-text text-white-50 mb-2" style={{ fontSize: "0.8rem", lineHeight: "1.4" }}>
-              {item.description.length > 60 ? item.description.substring(0, 60) + "..." : item.description}
+            <p className="card-text text-white-50 mb-2" style={{ fontSize: "0.78rem", lineHeight: "1.4" }}>
+              {item.description.length > 65 ? item.description.substring(0, 65) + "..." : item.description}
             </p>
           )}
 
           <div className="mt-auto d-flex justify-content-between align-items-center">
-            <span className="fw-bold" style={{ color: "#e94560", fontSize: "1.2rem" }}>
-              ₹{parseFloat(item.price).toFixed(2)}
+            {/* Gradient price */}
+            <span className="price-tag" style={{ fontSize: "1.25rem" }}>
+              ₹{parseFloat(item.price).toFixed(0)}
             </span>
 
             {userRole !== "admin" && (
               <button
                 id={`add-cart-${item.id}`}
-                className="btn btn-sm d-flex align-items-center gap-1"
+                className="btn btn-sm btn-gradient d-flex align-items-center gap-1"
                 onClick={handleAddToCart}
                 style={{
-                  background: "linear-gradient(135deg, #e94560, #c0392b)",
-                  color: "white",
-                  border: "none",
                   borderRadius: "20px",
                   padding: "6px 14px",
                   fontSize: "0.8rem",
-                  transition: "all 0.2s",
+                  boxShadow: "0 3px 12px rgba(239,68,68,0.25)",
                 }}
               >
-                <FiShoppingCart size={14} />
-                Add
+                <FiShoppingCart size={14} style={{ position: "relative", zIndex: 1 }} />
+                <span style={{ position: "relative", zIndex: 1 }}>Add</span>
               </button>
             )}
           </div>

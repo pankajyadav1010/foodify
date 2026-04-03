@@ -79,9 +79,9 @@ const Login = () => {
           <div className="col-12 col-sm-8 col-md-6 col-lg-4">
             {/* Logo */}
             <div className="text-center mb-4">
-              <MdRestaurantMenu size={50} style={{ color: "#e94560" }} />
+              <MdRestaurantMenu size={50} className="gradient-text" style={{ WebkitTextFillColor: "unset", color: "#ef4444" }} />
               <h2 className="text-white fw-bold mt-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                Food<span style={{ color: "#e94560" }}>ify</span>
+                Food<span className="gradient-text">ify</span>
               </h2>
               <p className="text-white-50">Sign in to your account</p>
             </div>
@@ -89,7 +89,7 @@ const Login = () => {
             {/* Login Card */}
             <div
               className="card border-0"
-              style={{ background: "#161b22", borderRadius: "20px", padding: "32px", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
+              style={{ background: "#161b22", borderRadius: "20px", padding: "32px", boxShadow: "0 20px 60px rgba(0,0,0,0.4)", border: "1px solid rgba(239,68,68,0.08)" }}
             >
               {errors.general && (
                 <div className="alert mb-3" style={{ background: "rgba(233,69,96,0.1)", border: "1px solid #e94560", color: "#e94560", borderRadius: "10px", fontSize: "0.85rem" }}>
@@ -156,17 +156,9 @@ const Login = () => {
                 <button
                   id="login-submit-btn"
                   type="submit"
-                  className="btn w-100 fw-bold"
+                  className="btn w-100 fw-bold btn-gradient"
                   disabled={loading}
-                  style={{
-                    background: loading ? "#6b7280" : "linear-gradient(135deg, #e94560, #c0392b)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "12px",
-                    padding: "12px",
-                    fontSize: "1rem",
-                    transition: "all 0.2s",
-                  }}
+                  style={{ borderRadius: "12px", padding: "12px", fontSize: "1rem" }}
                 >
                   {loading ? (
                     <>

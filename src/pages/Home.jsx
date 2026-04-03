@@ -1,4 +1,4 @@
-// Home.jsx - Main landing page with menu browsing, search, and category filter
+// Home.jsx - Main landing page with gradient accents and smooth animations
 import React, { useEffect, useState, useCallback } from "react";
 import { getMenuItems } from "../services/menuService";
 import FoodCard from "../components/FoodCard";
@@ -17,10 +17,9 @@ const Home = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [error, setError] = useState(null);
 
-  // Fetch menu items from Firestore (with graceful fallback to demo items)
+  // Fetch menu items from Firestore
   const fetchMenu = useCallback(async () => {
     setLoading(true);
-    // Short timeout to show demo items quickly if Firebase isn't responding
     const timeoutId = setTimeout(() => {
       setMenuItems(DEMO_ITEMS);
       setFilteredItems(DEMO_ITEMS);
@@ -31,7 +30,6 @@ const Home = () => {
     try {
       const items = await getMenuItems();
       clearTimeout(timeoutId);
-      // Use demo items if Firestore menu collection is empty
       const displayItems = items.length > 0 ? items : DEMO_ITEMS;
       if (items.length === 0) setError("Menu is empty. Showing demo items. Add items via Admin Dashboard.");
       setMenuItems(displayItems);
@@ -52,14 +50,12 @@ const Home = () => {
     fetchMenu();
   }, [fetchMenu]);
 
-  // Filter items based on search and category
+  // Filter
   useEffect(() => {
     let result = menuItems;
-
     if (activeCategory !== "All") {
       result = result.filter((item) => item.category === activeCategory);
     }
-
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -69,7 +65,6 @@ const Home = () => {
           item.description?.toLowerCase().includes(query)
       );
     }
-
     setFilteredItems(result);
   }, [searchQuery, activeCategory, menuItems]);
 
@@ -77,31 +72,25 @@ const Home = () => {
 
   return (
     <div style={{ background: "#0d1117", minHeight: "100vh" }}>
-      {/* Hero Banner */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%)",
-          padding: "60px 0 40px",
-          marginBottom: "0",
-        }}
-      >
-        <div className="container text-center">
-          <MdRestaurantMenu size={60} style={{ color: "#e94560", marginBottom: "16px" }} />
+      {/* Hero Banner with gradient glow */}
+      <div className="hero-section" style={{ padding: "60px 0 40px" }}>
+        <div className="container text-center" style={{ position: "relative", zIndex: 1 }}>
+          <MdRestaurantMenu size={60} className="gradient-text" style={{ WebkitTextFillColor: "unset", color: "#ef4444", marginBottom: "16px" }} />
           <h1
             className="display-4 fw-bold text-white mb-3"
             style={{ fontFamily: "'Poppins', sans-serif" }}
           >
-            Discover <span style={{ color: "#e94560" }}>Delicious</span> Food
+            Discover <span className="gradient-text">Delicious</span> Food
           </h1>
           <p className="lead text-white-50 mb-4">
             Order your favorite meals and get them delivered fast 🚀
           </p>
 
-          {/* Search bar */}
+          {/* Enhanced search bar */}
           <div className="row justify-content-center">
             <div className="col-md-6">
-              <div className="input-group" style={{ borderRadius: "50px", overflow: "hidden", boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
-                <span className="input-group-text border-0" style={{ background: "#1e2a3a", color: "#e94560" }}>
+              <div className="input-group search-bar">
+                <span className="input-group-text border-0" style={{ background: "#1e2a3a", color: "#ef4444" }}>
                   <FiSearch size={20} />
                 </span>
                 <input
@@ -117,7 +106,7 @@ const Home = () => {
                   <button
                     className="btn border-0"
                     onClick={() => setSearchQuery("")}
-                    style={{ background: "#1e2a3a", color: "#e94560" }}
+                    style={{ background: "#1e2a3a", color: "#ef4444" }}
                   >
                     ✕
                   </button>
@@ -128,27 +117,17 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Category Filter */}
+      {/* Category Filter with gradient active pill */}
       <div style={{ background: "#161b22", padding: "16px 0", borderBottom: "1px solid #21262d" }}>
         <div className="container">
           <div className="d-flex align-items-center gap-2 overflow-auto pb-1" style={{ scrollbarWidth: "none" }}>
-            <FiFilter size={16} style={{ color: "#e94560", flexShrink: 0 }} />
+            <FiFilter size={16} style={{ color: "#ef4444", flexShrink: 0 }} />
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 id={`category-${cat.toLowerCase().replace(/\s/g, "-")}`}
-                className="btn btn-sm"
+                className={`btn btn-sm category-pill ${activeCategory === cat ? "active" : ""}`}
                 onClick={() => setActiveCategory(cat)}
-                style={{
-                  borderRadius: "20px",
-                  padding: "6px 18px",
-                  whiteSpace: "nowrap",
-                  fontWeight: activeCategory === cat ? "600" : "400",
-                  background: activeCategory === cat ? "#e94560" : "transparent",
-                  color: activeCategory === cat ? "white" : "rgba(255,255,255,0.6)",
-                  border: activeCategory === cat ? "none" : "1px solid #30363d",
-                  transition: "all 0.2s",
-                }}
               >
                 {cat}
               </button>
@@ -160,7 +139,7 @@ const Home = () => {
       {/* Menu Grid */}
       <div className="container py-4">
         {error && (
-          <div className="alert alert-warning mb-4" style={{ background: "rgba(243,156,18,0.1)", border: "1px solid #f39c12", color: "#f39c12" }}>
+          <div className="alert mb-4" style={{ background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.3)", color: "#f97316", borderRadius: "12px" }}>
             ⚠️ {error}
           </div>
         )}
@@ -169,13 +148,14 @@ const Home = () => {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h5 className="text-white-50 mb-0" style={{ fontWeight: 400 }}>
             {activeCategory !== "All" ? `${activeCategory} ` : ""}
-            <span className="text-white fw-bold">{filteredItems.length}</span> items found
+            <span className="gradient-text fw-bold">{filteredItems.length}</span>{" "}
+            <span className="text-white-50">items found</span>
           </h5>
           {(searchQuery || activeCategory !== "All") && (
             <button
-              className="btn btn-sm"
+              className="btn btn-sm btn-gradient-outline"
               onClick={() => { setSearchQuery(""); setActiveCategory("All"); }}
-              style={{ color: "#e94560", border: "1px solid #e94560", borderRadius: "20px" }}
+              style={{ padding: "4px 16px", fontSize: "0.8rem" }}
             >
               Clear Filters
             </button>

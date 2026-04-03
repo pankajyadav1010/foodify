@@ -1,4 +1,4 @@
-// LoadingSpinner.jsx - Reusable loading spinner component
+// LoadingSpinner.jsx - Loading spinner with gradient accent
 import React from "react";
 
 const LoadingSpinner = ({ message = "Loading..." }) => {
@@ -7,14 +7,22 @@ const LoadingSpinner = ({ message = "Loading..." }) => {
       className="d-flex flex-column justify-content-center align-items-center"
       style={{ minHeight: "60vh", gap: "20px" }}
     >
-      <div
-        className="spinner-border"
-        role="status"
-        style={{ width: "3rem", height: "3rem", color: "#e94560", borderWidth: "4px" }}
-      >
-        <span className="visually-hidden">Loading...</span>
+      <div style={{ position: "relative", width: "48px", height: "48px" }}>
+        <div
+          className="spinner-border"
+          role="status"
+          style={{
+            width: "48px",
+            height: "48px",
+            color: "#ef4444",
+            borderWidth: "4px",
+            borderTopColor: "#f97316",
+          }}
+        >
+          <span className="visually-hidden">Loading...</span>
+        </div>
       </div>
-      <p className="text-white-50 mb-0" style={{ fontSize: "1rem" }}>
+      <p className="text-white-50 mb-0" style={{ fontSize: "0.95rem", letterSpacing: "0.02em" }}>
         {message}
       </p>
     </div>

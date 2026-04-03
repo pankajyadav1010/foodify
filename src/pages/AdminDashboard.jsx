@@ -7,11 +7,11 @@ import {
   updateMenuItem,
   deleteMenuItem,
 } from "../services/menuService";
-import { getAllOrders, updateOrderStatus } from "../services/orderService";
+import { getAllOrders, updateOrderStatus, updateOrderDeliveryData } from "../services/orderService";
 import OrderStatusBadge from "../components/OrderStatusBadge";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { toast } from "react-hot-toast";
-import { FiPlus, FiEdit2, FiTrash2, FiRefreshCw, FiX, FiCheck } from "react-icons/fi";
+import { FiPlus, FiEdit2, FiTrash2, FiRefreshCw, FiX, FiCheck, FiTrendingUp, FiDollarSign, FiCalendar } from "react-icons/fi";
 import { MdRestaurantMenu, MdShoppingBag } from "react-icons/md";
 
 const CATEGORIES = ["Indian", "Chinese", "Fast Food", "South Indian", "Beverages", "Desserts"];
@@ -40,6 +40,10 @@ const AdminDashboard = () => {
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("All");
   const [updatingOrderId, setUpdatingOrderId] = useState(null);
+  const [activeSimulations, setActiveSimulations] = useState({});
+
+  // Revenue modal state
+  const [showRevenueModal, setShowRevenueModal] = useState(false);
 
   // Fetch menu items
   const fetchMenu = useCallback(async () => {
@@ -163,6 +167,49 @@ const AdminDashboard = () => {
     }
   };
 
+  // Delivery Simulation
+  const toggleSimulation = async (orderId) => {
+    if (activeSimulations[orderId]) {
+      clearInterval(activeSimulations[orderId]);
+      setActiveSimulations(p => { const np = {...p}; delete np[orderId]; return np; });
+      toast.success("Simulation stopped.");
+      return;
+    }
+
+    let currentLat = 28.7041;
+    let currentLng = 77.1025;
+    
+    setUpdatingOrderId(orderId);
+    try {
+      await updateOrderDeliveryData(orderId, {
+        status: "Out for Delivery",
+        deliveryPartner: { name: "Rahul (Demo)", phone: "+91 9876543210" },
+        location: { lat: currentLat, lng: currentLng }
+      });
+      toast.success("Delivery partner assigned. Simulation started! 🚴");
+      await fetchOrders();
+    } catch(e) {
+      toast.error("Failed to start simulation");
+      setUpdatingOrderId(null);
+      return;
+    }
+    setUpdatingOrderId(null);
+
+    const interval = setInterval(async () => {
+      currentLat += 0.0005;
+      currentLng += 0.0005;
+      try {
+        await updateOrderDeliveryData(orderId, {
+          location: { lat: currentLat, lng: currentLng }
+        });
+      } catch (err) {
+        console.error("Simulation interval error", err);
+      }
+    }, 3000);
+
+    setActiveSimulations(p => ({...p, [orderId]: interval}));
+  };
+
   // Format timestamp
   const formatDate = (ts) => {
     if (!ts) return "Unknown";
@@ -175,25 +222,51 @@ const AdminDashboard = () => {
     ? orders
     : orders.filter((o) => o.status === statusFilter);
 
+  // Delivered orders (used for revenue)
+  const deliveredOrders = orders
+    .filter((o) => o.status === "Delivered")
+    .sort((a, b) => {
+      const tA = a.createdAt?.seconds || 0;
+      const tB = b.createdAt?.seconds || 0;
+      return tB - tA;
+    });
+
   // Stats
   const stats = {
     totalItems: menuItems.length,
     totalOrders: orders.length,
     pendingOrders: orders.filter((o) => o.status === "Pending").length,
-    revenue: orders
-      .filter((o) => o.status === "Delivered")
-      .reduce((s, o) => s + parseFloat(o.total || 0), 0),
+    revenue: deliveredOrders.reduce((s, o) => s + parseFloat(o.total || 0), 0),
   };
+
+  // Group delivered orders by date for revenue breakdown
+  const revenueByDate = deliveredOrders.reduce((acc, order) => {
+    const ts = order.createdAt;
+    const date = ts?.toDate
+      ? ts.toDate().toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+      : ts?.seconds
+        ? new Date(ts.seconds * 1000).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+        : "Unknown Date";
+    if (!acc[date]) acc[date] = { orders: [], total: 0 };
+    acc[date].orders.push(order);
+    acc[date].total += parseFloat(order.total || 0);
+    return acc;
+  }, {});
+
+  // Average order value
+  const avgOrderValue = deliveredOrders.length > 0
+    ? (stats.revenue / deliveredOrders.length).toFixed(0)
+    : 0;
 
   return (
     <div style={{ background: "#0d1117", minHeight: "100vh" }}>
       {/* Admin Header */}
-      <div style={{ background: "linear-gradient(135deg, #1a1a2e, #16213e)", padding: "24px 0", borderBottom: "1px solid #21262d" }}>
-        <div className="container">
+      <div className="hero-section" style={{ padding: "24px 0", borderBottom: "1px solid rgba(239,68,68,0.1)" }}>
+        <div className="container" style={{ position: "relative", zIndex: 1 }}>
           <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
               <h2 className="text-white fw-bold mb-1" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                ⚙️ Admin Dashboard
+                ⚙️ Admin <span className="gradient-text">Dashboard</span>
               </h2>
               <p className="text-white-50 mb-0" style={{ fontSize: "0.85rem" }}>
                 Welcome back, {currentUser?.email}
@@ -203,18 +276,20 @@ const AdminDashboard = () => {
             {/* Stats Cards */}
             <div className="d-flex gap-3 flex-wrap">
               {[
-                { label: "Menu Items", value: stats.totalItems, color: "#3498db" },
-                { label: "Total Orders", value: stats.totalOrders, color: "#e94560" },
-                { label: "Pending", value: stats.pendingOrders, color: "#f39c12" },
-                { label: "Revenue", value: `₹${stats.revenue.toFixed(0)}`, color: "#27ae60" },
+                { label: "Menu Items", value: stats.totalItems, color: "#3b82f6", clickable: false },
+                { label: "Total Orders", value: stats.totalOrders, color: "#ef4444", clickable: false },
+                { label: "Pending", value: stats.pendingOrders, color: "#f59e0b", clickable: false },
+                { label: "Revenue", value: `₹${stats.revenue.toFixed(0)}`, color: "#22c55e", clickable: true },
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="text-center px-3 py-2 rounded-3"
-                  style={{ background: "#161b22", border: "1px solid #21262d", minWidth: "100px" }}
+                  className={`stat-card ${stat.clickable ? "clickable" : ""}`}
+                  onClick={stat.clickable ? () => setShowRevenueModal(true) : undefined}
                 >
                   <div className="fw-bold" style={{ color: stat.color, fontSize: "1.3rem" }}>{stat.value}</div>
-                  <div className="text-white-50" style={{ fontSize: "0.7rem" }}>{stat.label}</div>
+                  <div className="text-white-50" style={{ fontSize: "0.7rem" }}>
+                    {stat.label} {stat.clickable && <span style={{ fontSize: "0.6rem" }}>▶</span>}
+                  </div>
                 </div>
               ))}
             </div>
@@ -233,15 +308,8 @@ const AdminDashboard = () => {
               <button
                 key={tab.id}
                 id={`admin-tab-${tab.id}`}
-                className="btn border-0 py-3 px-4 rounded-0"
+                className={`tab-btn ${activeTab === tab.id ? "active" : ""}`}
                 onClick={() => setActiveTab(tab.id)}
-                style={{
-                  color: activeTab === tab.id ? "#e94560" : "rgba(255,255,255,0.5)",
-                  borderBottom: activeTab === tab.id ? "2px solid #e94560" : "2px solid transparent",
-                  background: "transparent",
-                  fontWeight: activeTab === tab.id ? 600 : 400,
-                  transition: "all 0.2s",
-                }}
               >
                 {tab.label}
               </button>
@@ -258,11 +326,11 @@ const AdminDashboard = () => {
               <h5 className="text-white fw-bold mb-0">Menu Items ({menuItems.length})</h5>
               <button
                 id="add-item-btn"
-                className="btn d-flex align-items-center gap-2"
+                className="btn btn-gradient d-flex align-items-center gap-2"
                 onClick={openAddModal}
-                style={{ background: "#e94560", color: "white", border: "none", borderRadius: "10px" }}
+                style={{ padding: "8px 20px", fontSize: "0.9rem" }}
               >
-                <FiPlus /> Add Item
+                <FiPlus style={{ position: "relative", zIndex: 1 }} /> <span style={{ position: "relative", zIndex: 1 }}>Add Item</span>
               </button>
             </div>
 
@@ -404,6 +472,23 @@ const AdminDashboard = () => {
                         <span className="fw-bold" style={{ color: "#e94560", fontSize: "1.2rem" }}>
                           ₹{parseFloat(order.total).toFixed(2)}
                         </span>
+
+                        {/* Simulation Button */}
+                        {order.status !== "Delivered" && order.status !== "Cancelled" && (
+                          <button
+                            className="btn btn-sm d-flex align-items-center gap-1"
+                            onClick={() => toggleSimulation(order.id)}
+                            style={{ 
+                              background: activeSimulations[order.id] ? "rgba(239,68,68,0.15)" : "rgba(39,174,96,0.15)", 
+                              color: activeSimulations[order.id] ? "#ef4444" : "#27ae60", 
+                              border: `1px solid ${activeSimulations[order.id] ? "#ef4444" : "#27ae60"}`,
+                              borderRadius: "8px"
+                            }}
+                          >
+                            {activeSimulations[order.id] ? "⏹ Stop Sim" : "🚴 Start Sim"}
+                          </button>
+                        )}
+
                         {/* Status Update Dropdown */}
                         <select
                           className="form-select form-select-sm border-0"
@@ -582,6 +667,149 @@ const AdminDashboard = () => {
                     {editingItem ? "Update Item" : "Add Item"}
                   </>
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── REVENUE HISTORY MODAL ─── */}
+      {showRevenueModal && (
+        <div
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+          style={{ background: "rgba(0,0,0,0.75)", zIndex: 9999, padding: "20px" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setShowRevenueModal(false); }}
+        >
+          <div
+            className="card border-0"
+            style={{ background: "#161b22", borderRadius: "20px", padding: "32px", width: "100%", maxWidth: "700px", maxHeight: "90vh", overflowY: "auto" }}
+          >
+            {/* Modal Header */}
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h5 className="text-white fw-bold mb-1 d-flex align-items-center gap-2">
+                  <FiTrendingUp style={{ color: "#27ae60" }} /> Revenue History
+                </h5>
+                <p className="text-white-50 mb-0" style={{ fontSize: "0.8rem" }}>
+                  Earnings from {deliveredOrders.length} delivered orders
+                </p>
+              </div>
+              <button
+                className="btn p-1"
+                onClick={() => setShowRevenueModal(false)}
+                style={{ background: "rgba(255,255,255,0.1)", color: "white", borderRadius: "8px", border: "none" }}
+              >
+                <FiX size={18} />
+              </button>
+            </div>
+
+            {/* Revenue Summary Cards */}
+            <div className="row g-3 mb-4">
+              {[
+                { label: "Total Revenue", value: `₹${stats.revenue.toFixed(2)}`, icon: <FiDollarSign />, color: "#27ae60", bg: "rgba(39,174,96,0.1)" },
+                { label: "Delivered Orders", value: deliveredOrders.length, icon: <FiCheck />, color: "#3498db", bg: "rgba(52,152,219,0.1)" },
+                { label: "Avg Order Value", value: `₹${avgOrderValue}`, icon: <FiTrendingUp />, color: "#f39c12", bg: "rgba(243,156,18,0.1)" },
+              ].map((card) => (
+                <div key={card.label} className="col-4">
+                  <div className="text-center p-3 rounded-3" style={{ background: card.bg, border: `1px solid ${card.color}30` }}>
+                    <div style={{ color: card.color, marginBottom: "4px" }}>{card.icon}</div>
+                    <div className="fw-bold text-white" style={{ fontSize: "1.2rem" }}>{card.value}</div>
+                    <div className="text-white-50" style={{ fontSize: "0.7rem" }}>{card.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {deliveredOrders.length === 0 ? (
+              <div className="text-center py-5">
+                <div style={{ fontSize: "3rem" }}>💰</div>
+                <h6 className="text-white mt-3">No revenue yet</h6>
+                <p className="text-white-50" style={{ fontSize: "0.85rem" }}>Revenue will appear here when orders are marked as Delivered.</p>
+              </div>
+            ) : (
+              /* Revenue grouped by date */
+              <div className="d-flex flex-column gap-4">
+                {Object.entries(revenueByDate).map(([date, data]) => (
+                  <div key={date}>
+                    {/* Date Header */}
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <div className="d-flex align-items-center gap-2">
+                        <FiCalendar size={14} style={{ color: "#3498db" }} />
+                        <span className="text-white fw-semibold" style={{ fontSize: "0.9rem" }}>{date}</span>
+                        <span className="badge" style={{ background: "#1e2a3a", color: "rgba(255,255,255,0.5)", fontSize: "0.7rem" }}>
+                          {data.orders.length} order{data.orders.length > 1 ? "s" : ""}
+                        </span>
+                      </div>
+                      <span className="fw-bold" style={{ color: "#27ae60", fontSize: "1rem" }}>
+                        ₹{data.total.toFixed(2)}
+                      </span>
+                    </div>
+
+                    {/* Orders for this date */}
+                    <div className="d-flex flex-column gap-2">
+                      {data.orders.map((order) => {
+                        const time = order.createdAt?.toDate
+                          ? order.createdAt.toDate().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+                          : order.createdAt?.seconds
+                            ? new Date(order.createdAt.seconds * 1000).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+                            : "";
+                        return (
+                          <div
+                            key={order.id}
+                            className="d-flex justify-content-between align-items-center p-3 rounded-3"
+                            style={{ background: "#1e2a3a", border: "1px solid #21262d" }}
+                          >
+                            <div className="d-flex align-items-center gap-3">
+                              <div
+                                className="d-flex align-items-center justify-content-center rounded-circle"
+                                style={{ width: "36px", height: "36px", background: "rgba(39,174,96,0.15)", flexShrink: 0 }}
+                              >
+                                <FiDollarSign size={16} style={{ color: "#27ae60" }} />
+                              </div>
+                              <div>
+                                <div className="text-white" style={{ fontSize: "0.85rem", fontWeight: 600 }}>
+                                  #{order.id.substring(0, 8).toUpperCase()}
+                                  {time && <span className="text-white-50 ms-2" style={{ fontSize: "0.75rem", fontWeight: 400 }}>{time}</span>}
+                                </div>
+                                <div className="text-white-50" style={{ fontSize: "0.75rem" }}>
+                                  {order.userEmail} · {order.items?.length} item{order.items?.length !== 1 ? "s" : ""}
+                                </div>
+                                {/* Show item names */}
+                                <div className="d-flex flex-wrap gap-1 mt-1">
+                                  {order.items?.slice(0, 3).map((item, idx) => (
+                                    <span key={idx} className="badge" style={{ background: "#161b22", color: "rgba(255,255,255,0.5)", fontSize: "0.65rem", fontWeight: 400 }}>
+                                      {item.name} ×{item.quantity}
+                                    </span>
+                                  ))}
+                                  {order.items?.length > 3 && (
+                                    <span className="badge" style={{ background: "#161b22", color: "rgba(255,255,255,0.3)", fontSize: "0.65rem" }}>
+                                      +{order.items.length - 3} more
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="text-end" style={{ flexShrink: 0 }}>
+                              <div className="fw-bold" style={{ color: "#27ae60", fontSize: "1rem" }}>₹{parseFloat(order.total).toFixed(2)}</div>
+                              <div className="badge" style={{ background: "rgba(39,174,96,0.15)", color: "#27ae60", fontSize: "0.65rem" }}>Delivered ✓</div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Close Button */}
+            <div className="mt-4 text-center">
+              <button
+                className="btn px-4"
+                onClick={() => setShowRevenueModal(false)}
+                style={{ border: "1px solid #30363d", color: "rgba(255,255,255,0.6)", background: "transparent", borderRadius: "10px" }}
+              >
+                Close
               </button>
             </div>
           </div>

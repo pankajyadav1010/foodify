@@ -1,4 +1,4 @@
-// Navbar.jsx - Main navigation bar with cart count and auth state
+// Navbar.jsx - Main navigation bar with gradient accents and animations
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -27,13 +27,21 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark sticky-top" style={{ background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)", boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
+    <nav
+      className="navbar navbar-expand-lg navbar-dark sticky-top"
+      style={{
+        background: "linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a1a2e 100%)",
+        boxShadow: "0 4px 30px rgba(0,0,0,0.4)",
+        borderBottom: "1px solid rgba(239,68,68,0.1)",
+        backdropFilter: "blur(10px)",
+      }}
+    >
       <div className="container">
-        {/* Brand */}
+        {/* Brand with gradient */}
         <Link className="navbar-brand d-flex align-items-center gap-2" to="/">
-          <MdRestaurantMenu size={30} style={{ color: "#e94560" }} />
-          <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: "1.5rem" }}>
-            Food<span style={{ color: "#e94560" }}>ify</span>
+          <MdRestaurantMenu size={30} className="gradient-text" style={{ WebkitTextFillColor: "unset", color: "#ef4444" }} />
+          <span className="navbar-brand-gradient">
+            Food<span>ify</span>
           </span>
         </Link>
 
@@ -52,10 +60,10 @@ const Navbar = () => {
           <ul className="navbar-nav me-auto mb-2 mb-lg-0 ms-3">
             <li className="nav-item">
               <Link
-                className={`nav-link ${isActive("/") ? "active fw-bold" : ""}`}
+                className={`nav-link nav-link-animated ${isActive("/") ? "active fw-bold" : ""}`}
                 to="/"
                 onClick={() => setMobileOpen(false)}
-                style={{ color: isActive("/") ? "#e94560" : "rgba(255,255,255,0.85)" }}
+                style={{ color: isActive("/") ? "white" : "rgba(255,255,255,0.7)" }}
               >
                 🏠 Home
               </Link>
@@ -65,14 +73,14 @@ const Navbar = () => {
               <>
                 <li className="nav-item">
                   <Link
-                    className={`nav-link ${isActive("/cart") ? "active fw-bold" : ""}`}
+                    className={`nav-link nav-link-animated ${isActive("/cart") ? "active fw-bold" : ""}`}
                     to="/cart"
                     onClick={() => setMobileOpen(false)}
-                    style={{ color: isActive("/cart") ? "#e94560" : "rgba(255,255,255,0.85)" }}
+                    style={{ color: isActive("/cart") ? "white" : "rgba(255,255,255,0.7)" }}
                   >
                     🛒 Cart
                     {getItemCount() > 0 && (
-                      <span className="badge ms-1 rounded-pill" style={{ background: "#e94560", fontSize: "0.7rem" }}>
+                      <span className="badge ms-1 rounded-pill" style={{ background: "linear-gradient(to right, #ef4444, #f97316)", fontSize: "0.7rem" }}>
                         {getItemCount()}
                       </span>
                     )}
@@ -80,10 +88,10 @@ const Navbar = () => {
                 </li>
                 <li className="nav-item">
                   <Link
-                    className={`nav-link ${isActive("/orders") ? "active fw-bold" : ""}`}
+                    className={`nav-link nav-link-animated ${isActive("/orders") ? "active fw-bold" : ""}`}
                     to="/orders"
                     onClick={() => setMobileOpen(false)}
-                    style={{ color: isActive("/orders") ? "#e94560" : "rgba(255,255,255,0.85)" }}
+                    style={{ color: isActive("/orders") ? "white" : "rgba(255,255,255,0.7)" }}
                   >
                     📦 My Orders
                   </Link>
@@ -94,10 +102,10 @@ const Navbar = () => {
             {currentUser && userRole === "admin" && (
               <li className="nav-item">
                 <Link
-                  className={`nav-link ${isActive("/admin") ? "active fw-bold" : ""}`}
+                  className={`nav-link nav-link-animated ${isActive("/admin") ? "active fw-bold" : ""}`}
                   to="/admin"
                   onClick={() => setMobileOpen(false)}
-                  style={{ color: isActive("/admin") ? "#e94560" : "rgba(255,255,255,0.85)" }}
+                  style={{ color: isActive("/admin") ? "white" : "rgba(255,255,255,0.7)" }}
                 >
                   ⚙️ Admin Panel
                 </Link>
@@ -109,11 +117,11 @@ const Navbar = () => {
           <div className="d-flex align-items-center gap-3">
             {currentUser ? (
               <>
-                <span className="text-white-50 d-none d-lg-block" style={{ fontSize: "0.85rem" }}>
+                <span className="text-white-50 d-none d-lg-flex align-items-center gap-1" style={{ fontSize: "0.85rem" }}>
                   <FiUser className="me-1" />
                   {currentUser.email?.split("@")[0]}
                   {userRole === "admin" && (
-                    <span className="badge ms-2" style={{ background: "#e94560", fontSize: "0.65rem" }}>ADMIN</span>
+                    <span className="badge ms-2" style={{ background: "linear-gradient(to right, #ef4444, #f97316)", fontSize: "0.6rem", padding: "3px 8px" }}>ADMIN</span>
                   )}
                 </span>
 
@@ -122,40 +130,38 @@ const Navbar = () => {
                   <Link to="/cart" className="position-relative d-lg-none text-white" onClick={() => setMobileOpen(false)}>
                     <FiShoppingCart size={22} />
                     {getItemCount() > 0 && (
-                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill" style={{ background: "#e94560", fontSize: "0.6rem" }}>
-                        {getItemCount()}
-                      </span>
+                      <span className="cart-badge">{getItemCount()}</span>
                     )}
                   </Link>
                 )}
 
                 <button
                   id="logout-btn"
-                  className="btn btn-sm d-flex align-items-center gap-1"
+                  className="btn btn-sm btn-gradient d-flex align-items-center gap-1"
                   onClick={handleLogout}
-                  style={{ background: "#e94560", color: "white", border: "none", borderRadius: "8px", padding: "6px 16px" }}
+                  style={{ padding: "6px 16px", fontSize: "0.85rem" }}
                 >
-                  <FiLogOut size={16} />
-                  <span className="d-none d-sm-inline">Logout</span>
+                  <FiLogOut size={16} style={{ position: "relative", zIndex: 1 }} />
+                  <span className="d-none d-sm-inline" style={{ position: "relative", zIndex: 1 }}>Logout</span>
                 </button>
               </>
             ) : (
               <div className="d-flex gap-2">
                 <Link
                   to="/login"
-                  className="btn btn-sm"
+                  className="btn btn-sm btn-gradient-outline"
                   onClick={() => setMobileOpen(false)}
-                  style={{ border: "1px solid #e94560", color: "#e94560", borderRadius: "8px", padding: "6px 16px" }}
+                  style={{ padding: "6px 16px", fontSize: "0.85rem" }}
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="btn btn-sm"
+                  className="btn btn-sm btn-gradient"
                   onClick={() => setMobileOpen(false)}
-                  style={{ background: "#e94560", color: "white", border: "none", borderRadius: "8px", padding: "6px 16px" }}
+                  style={{ padding: "6px 16px", fontSize: "0.85rem" }}
                 >
-                  Register
+                  <span style={{ position: "relative", zIndex: 1 }}>Register</span>
                 </Link>
               </div>
             )}

@@ -1,9 +1,10 @@
 // Orders.jsx - Customer order history with status tracking
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getUserOrders } from "../services/orderService";
+import { listenToUserOrders } from "../services/orderService";
 import OrderStatusBadge from "../components/OrderStatusBadge";
 import LoadingSpinner from "../components/LoadingSpinner";
+import MapComponent from "../components/MapComponent";
 import { Link } from "react-router-dom";
 import { FiPackage, FiClock, FiRefreshCw } from "react-icons/fi";
 import { toast } from "react-hot-toast";
@@ -14,29 +15,21 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchOrders = useCallback(async () => {
-    try {
-      const userOrders = await getUserOrders(currentUser.uid);
-      setOrders(userOrders);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      toast.error("Failed to load orders: " + error.message);
-    }
+  useEffect(() => {
+    setLoading(true);
+    const unsubscribe = listenToUserOrders(currentUser.uid, (data) => {
+      setOrders(data);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [currentUser]);
 
-  useEffect(() => {
-    const loadOrders = async () => {
-      setLoading(true);
-      await fetchOrders();
-      setLoading(false);
-    };
-    loadOrders();
-  }, [fetchOrders]);
-
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
+    // With real-time listeners, a manual refresh isn't strictly necessary, 
+    // but we'll show a quick loading animation for UX 
     setRefreshing(true);
-    await fetchOrders();
-    setRefreshing(false);
+    setTimeout(() => setRefreshing(false), 800);
   };
 
   // Format Firestore timestamp
@@ -63,12 +56,8 @@ const Orders = () => {
         <FiPackage size={80} style={{ color: "#30363d", marginBottom: "20px" }} />
         <h3 className="text-white mb-3">No orders yet</h3>
         <p className="text-white-50 mb-4">Start ordering your favorite food!</p>
-        <Link
-          to="/"
-          className="btn"
-          style={{ background: "linear-gradient(135deg, #e94560, #c0392b)", color: "white", border: "none", borderRadius: "12px", padding: "12px 24px", textDecoration: "none" }}
-        >
-          Order Now 🍕
+        <Link to="/" className="btn btn-gradient" style={{ textDecoration: "none" }}>
+          <span style={{ position: "relative", zIndex: 1 }}>Order Now 🍕</span>
         </Link>
       </div>
     );
@@ -80,7 +69,7 @@ const Orders = () => {
         {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="text-white fw-bold mb-0" style={{ fontFamily: "'Poppins', sans-serif" }}>
-            📦 My Orders
+            📦 My <span className="gradient-text">Orders</span>
           </h2>
           <button
             className="btn btn-sm d-flex align-items-center gap-2"
@@ -119,7 +108,7 @@ const Orders = () => {
                   </div>
                 </div>
                 <div className="text-end">
-                  <div className="fw-bold" style={{ color: "#e94560", fontSize: "1.2rem" }}>
+                  <div className="price-tag" style={{ fontSize: "1.2rem" }}>
                     ₹{parseFloat(order.total).toFixed(2)}
                   </div>
                   <div className="text-white-50" style={{ fontSize: "0.8rem" }}>
@@ -171,11 +160,11 @@ const Orders = () => {
                             style={{
                               width: "28px",
                               height: "28px",
-                              background: isActive ? "#e94560" : "#21262d",
-                              border: `2px solid ${isActive ? "#e94560" : "#30363d"}`,
+                              background: isActive ? "linear-gradient(to right, #ef4444, #f97316)" : "#21262d",
+                              border: `2px solid ${isActive ? "transparent" : "#30363d"}`,
                               fontSize: "0.7rem",
                               color: "white",
-                              boxShadow: isCurrent ? "0 0 10px rgba(233,69,96,0.5)" : "none",
+                              boxShadow: isCurrent ? "0 0 12px rgba(239,68,68,0.5)" : isActive ? "0 0 8px rgba(239,68,68,0.2)" : "none",
                               transition: "all 0.3s",
                             }}
                           >
@@ -184,7 +173,7 @@ const Orders = () => {
                           <span
                             style={{
                               fontSize: "0.65rem",
-                              color: isActive ? "#e94560" : "rgba(255,255,255,0.3)",
+                              color: isActive ? "#ef4444" : "rgba(255,255,255,0.3)",
                               textAlign: "center",
                               lineHeight: "1.2",
                             }}
@@ -206,6 +195,30 @@ const Orders = () => {
                     })}
                   </div>
                 </div>
+
+                {/* Real-time Tracking Map */}
+                {order.status === "Out for Delivery" && order.deliveryPartner && (
+                  <div className="mt-4 pt-4" style={{ borderTop: "1px solid #21262d" }}>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <div>
+                        <div className="fw-bold text-white d-flex align-items-center gap-2">
+                          <span style={{ fontSize: "1.2rem" }}>🚴</span> Delivery Partner On The Way
+                        </div>
+                        <div className="text-white-50" style={{ fontSize: "0.85rem" }}>
+                          {order.deliveryPartner.name} • 📞 {order.deliveryPartner.phone}
+                        </div>
+                      </div>
+                      <div className="badge" style={{ background: "rgba(39,174,96,0.15)", color: "#27ae60", padding: "8px 12px", border: "1px solid rgba(39,174,96,0.3)" }}>
+                        Live Tracking Active
+                      </div>
+                    </div>
+                    {order.location && (
+                      <div className="rounded overflow-hidden" style={{ border: "2px solid #21262d" }}>
+                        <MapComponent location={order.location} />
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ))}

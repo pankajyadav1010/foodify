@@ -17,9 +17,21 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [tapCount, setTapCount] = useState(0);
+  const [showAdminOption, setShowAdminOption] = useState(false);
 
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  const handleJoinClick = () => {
+    const newCount = tapCount + 1;
+    setTapCount(newCount);
+    if (newCount === 4) {
+      setShowAdminOption(true);
+      toast.success("Admin mode unlocked");
+      setTapCount(0);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -76,9 +88,13 @@ const Register = () => {
           <div className="col-12 col-sm-8 col-md-6 col-lg-5">
             {/* Logo */}
             <div className="text-center mb-4">
-              <MdRestaurantMenu size={50} style={{ color: "#e94560" }} />
-              <h2 className="text-white fw-bold mt-2" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                Join <span style={{ color: "#e94560" }}>Foodify</span>
+              <MdRestaurantMenu size={50} className="gradient-text" style={{ WebkitTextFillColor: "unset", color: "#ef4444" }} />
+              <h2 
+                className="text-white fw-bold mt-2" 
+                style={{ fontFamily: "'Poppins', sans-serif", userSelect: "none" }}
+                onClick={handleJoinClick}
+              >
+                Join <span className="gradient-text">Foodify</span>
               </h2>
               <p className="text-white-50">Create your account to get started</p>
             </div>
@@ -86,7 +102,7 @@ const Register = () => {
             {/* Register Card */}
             <div
               className="card border-0"
-              style={{ background: "#161b22", borderRadius: "20px", padding: "32px", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}
+              style={{ background: "#161b22", borderRadius: "20px", padding: "32px", boxShadow: "0 20px 60px rgba(0,0,0,0.4)", border: "1px solid rgba(239,68,68,0.08)" }}
             >
               {errors.general && (
                 <div className="alert mb-3" style={{ background: "rgba(233,69,96,0.1)", border: "1px solid #e94560", color: "#e94560", borderRadius: "10px", fontSize: "0.85rem" }}>
@@ -204,19 +220,21 @@ const Register = () => {
                       <div style={{ fontSize: "1.5rem" }}>👤</div>
                       <div className="text-white" style={{ fontSize: "0.85rem", fontWeight: formData.role === "customer" ? 600 : 400 }}>Customer</div>
                     </div>
-                    <div
-                      className="flex-fill text-center p-3 rounded-3"
-                      onClick={() => setFormData((p) => ({ ...p, role: "admin" }))}
-                      style={{
-                        background: formData.role === "admin" ? "rgba(233,69,96,0.15)" : "#1e2a3a",
-                        border: formData.role === "admin" ? "1px solid #e94560" : "1px solid #30363d",
-                        cursor: "pointer",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      <div style={{ fontSize: "1.5rem" }}>⚙️</div>
-                      <div className="text-white" style={{ fontSize: "0.85rem", fontWeight: formData.role === "admin" ? 600 : 400 }}>Restaurant Admin</div>
-                    </div>
+                    {showAdminOption && (
+                      <div
+                        className="flex-fill text-center p-3 rounded-3"
+                        onClick={() => setFormData((p) => ({ ...p, role: "admin" }))}
+                        style={{
+                          background: formData.role === "admin" ? "rgba(233,69,96,0.15)" : "#1e2a3a",
+                          border: formData.role === "admin" ? "1px solid #e94560" : "1px solid #30363d",
+                          cursor: "pointer",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        <div style={{ fontSize: "1.5rem" }}>⚙️</div>
+                        <div className="text-white" style={{ fontSize: "0.85rem", fontWeight: formData.role === "admin" ? 600 : 400 }}>Restaurant Admin</div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -224,16 +242,9 @@ const Register = () => {
                 <button
                   id="register-submit-btn"
                   type="submit"
-                  className="btn w-100 fw-bold"
+                  className="btn w-100 fw-bold btn-gradient"
                   disabled={loading}
-                  style={{
-                    background: loading ? "#6b7280" : "linear-gradient(135deg, #e94560, #c0392b)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "12px",
-                    padding: "12px",
-                    fontSize: "1rem",
-                  }}
+                  style={{ borderRadius: "12px", padding: "12px", fontSize: "1rem" }}
                 >
                   {loading ? (
                     <>

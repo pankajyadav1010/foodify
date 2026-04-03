@@ -104,13 +104,13 @@ const Checkout = () => {
       >
         <div
           className="rounded-circle d-flex align-items-center justify-content-center mb-4"
-          style={{ width: "100px", height: "100px", background: "rgba(39,174,96,0.2)", border: "3px solid #27ae60" }}
+          style={{ width: "100px", height: "100px", background: "rgba(34,197,94,0.15)", border: "3px solid #22c55e" }}
         >
-          <FiCheck size={50} style={{ color: "#27ae60" }} />
+          <FiCheck size={50} style={{ color: "#22c55e" }} />
         </div>
-        <h2 className="text-white fw-bold mb-3">Order Placed! 🎉</h2>
+        <h2 className="text-white fw-bold mb-3">Order <span className="gradient-text">Placed!</span> 🎉</h2>
         <p className="text-white-50 mb-4">Your delicious food is being prepared. You'll be redirected to your orders...</p>
-        <div className="spinner-border" style={{ color: "#e94560" }} role="status" />
+        <div className="spinner-border" style={{ color: "#ef4444" }} role="status" />
       </div>
     );
   }
@@ -119,7 +119,7 @@ const Checkout = () => {
     <div style={{ background: "#0d1117", minHeight: "100vh", padding: "30px 0" }}>
       <div className="container">
         <h2 className="text-white fw-bold mb-4" style={{ fontFamily: "'Poppins', sans-serif" }}>
-          🧾 Checkout
+          🧱 <span className="gradient-text">Checkout</span>
         </h2>
 
         <div className="row g-4">
@@ -128,9 +128,9 @@ const Checkout = () => {
             {/* Delivery Address */}
             <div
               className="card border-0 mb-4"
-              style={{ background: "#161b22", borderRadius: "16px", padding: "24px" }}
+              style={{ background: "#161b22", borderRadius: "16px", padding: "24px", border: "1px solid rgba(239,68,68,0.05)" }}
             >
-              <h5 className="text-white fw-bold mb-4">📍 Delivery Address</h5>
+              <h5 className="text-white fw-bold mb-4">📍 Delivery <span className="gradient-text">Address</span></h5>
               <div className="row g-3">
                 <div className="col-md-6">
                   <label className="form-label text-white-50" style={{ fontSize: "0.85rem" }}>Full Name *</label>
@@ -214,15 +214,15 @@ const Checkout = () => {
                     className="d-flex align-items-center p-3 rounded-3"
                     onClick={() => setPaymentMethod(method.id)}
                     style={{
-                      background: paymentMethod === method.id ? "rgba(233,69,96,0.1)" : "#1e2a3a",
-                      border: paymentMethod === method.id ? "1px solid #e94560" : "1px solid #30363d",
+                      background: paymentMethod === method.id ? "rgba(239,68,68,0.08)" : "#1e2a3a",
+                      border: paymentMethod === method.id ? "1px solid #ef4444" : "1px solid #30363d",
                       cursor: "pointer",
-                      transition: "all 0.2s",
+                      transition: "all 0.25s ease",
                     }}
                   >
                     <div
                       className="me-3 d-flex align-items-center justify-content-center"
-                      style={{ width: "40px", height: "40px", background: paymentMethod === method.id ? "#e94560" : "#30363d", borderRadius: "10px", color: "white" }}
+                      style={{ width: "40px", height: "40px", background: paymentMethod === method.id ? "linear-gradient(to right, #ef4444, #f97316)" : "#30363d", borderRadius: "10px", color: "white", transition: "all 0.25s" }}
                     >
                       {method.icon}
                     </div>
@@ -236,8 +236,8 @@ const Checkout = () => {
                         style={{
                           width: "20px",
                           height: "20px",
-                          borderColor: paymentMethod === method.id ? "#e94560" : "#30363d",
-                          background: paymentMethod === method.id ? "#e94560" : "transparent",
+                          borderColor: paymentMethod === method.id ? "#ef4444" : "#30363d",
+                          background: paymentMethod === method.id ? "linear-gradient(to right, #ef4444, #f97316)" : "transparent",
                         }}
                       >
                         {paymentMethod === method.id && <FiCheck size={12} style={{ color: "white" }} />}
@@ -257,9 +257,9 @@ const Checkout = () => {
           <div className="col-lg-5">
             <div
               className="card border-0 sticky-top"
-              style={{ background: "#161b22", borderRadius: "16px", padding: "24px", top: "80px" }}
+              style={{ background: "#161b22", borderRadius: "16px", padding: "24px", top: "80px", border: "1px solid rgba(239,68,68,0.05)" }}
             >
-              <h5 className="text-white fw-bold mb-4">🛍️ Order Summary</h5>
+              <h5 className="text-white fw-bold mb-4">🛍️ Order <span className="gradient-text">Summary</span></h5>
 
               {/* Cart items */}
               <div className="mb-3" style={{ maxHeight: "250px", overflowY: "auto" }}>
@@ -280,7 +280,7 @@ const Checkout = () => {
                 ))}
               </div>
 
-              <div style={{ height: "1px", background: "#21262d", margin: "16px 0" }} />
+              <div className="gradient-divider" style={{ margin: "16px 0" }} />
 
               <div className="d-flex justify-content-between mb-2">
                 <span className="text-white-50">Subtotal</span>
@@ -292,31 +292,24 @@ const Checkout = () => {
               </div>
               <div className="d-flex justify-content-between mb-2">
                 <span className="text-white-50">Delivery</span>
-                <span style={{ color: "#27ae60" }}>FREE</span>
+                <span style={{ color: "#22c55e" }}>FREE</span>
               </div>
 
-              <div style={{ height: "1px", background: "#21262d", margin: "16px 0" }} />
+              <div className="gradient-divider" style={{ margin: "16px 0" }} />
 
               <div className="d-flex justify-content-between mb-4">
                 <span className="text-white fw-bold" style={{ fontSize: "1.1rem" }}>Grand Total</span>
-                <span className="fw-bold" style={{ color: "#e94560", fontSize: "1.3rem" }}>
+                <span className="price-tag" style={{ fontSize: "1.4rem" }}>
                   ₹{grandTotal.toFixed(2)}
                 </span>
               </div>
 
               <button
                 id="place-order-btn"
-                className="btn w-100 fw-bold"
+                className="btn w-100 fw-bold btn-gradient"
                 onClick={handlePlaceOrder}
                 disabled={loading}
-                style={{
-                  background: loading ? "#6b7280" : "linear-gradient(135deg, #e94560, #c0392b)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "12px",
-                  padding: "14px",
-                  fontSize: "1rem",
-                }}
+                style={{ padding: "14px", fontSize: "1rem" }}
               >
                 {loading ? (
                   <>
