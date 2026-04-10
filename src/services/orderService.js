@@ -153,3 +153,34 @@ export const updateOrderDeliveryData = async (orderId, data) => {
   const orderRef = doc(db, ORDERS_COLLECTION, orderId);
   await updateDoc(orderRef, data);
 };
+
+/**
+ * Cancel an order — customer can only cancel their own Pending or Preparing orders
+ * @param {string} orderId - Firestore order document ID
+ * @param {string} currentUserId - UID of the authenticated user
+ * @param {object} orderData - The full order object (for ownership + status check)
+ * @param {string} [cancelReason] - Optional reason for cancellation
+ */
+export const cancelOrder = async (orderId, currentUserId, orderData, cancelReason = "") => {
+  // Security: ensure user owns the order
+  if (orderData.userId !== currentUserId) {
+    throw new Error("Unauthorized: You can only cancel your own orders.");
+  }
+
+  // Business rule: only allow cancel for Pending or Preparing
+  const cancellableStatuses = ["Pending", "Preparing"];
+  if (!cancellableStatuses.includes(orderData.status)) {
+    throw new Error(
+      `Cannot cancel an order with status "${orderData.status}". Only Pending or Preparing orders can be cancelled.`
+    );
+  }
+
+  const orderRef = doc(db, ORDERS_COLLECTION, orderId);
+  const updatePayload = {
+    status: "Cancelled",
+    cancelledAt: serverTimestamp(),
+    ...(cancelReason.trim() && { cancelReason: cancelReason.trim() }),
+  };
+
+  await updateDoc(orderRef, updatePayload);
+};

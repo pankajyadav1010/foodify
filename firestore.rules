@@ -2,23 +2,37 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users - any authenticated user can create their own doc, read their own doc
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read: if request.auth != null;
-    }
-
-    // Menu - anyone can read, any authenticated user can write (for now)
+    // ── Menu items: readable by anyone, writable by admin only ──
     match /menu/{itemId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.admin == true;
     }
 
-    // Orders - authenticated users can create, read their own, admins can read/update all
+    // ── Orders ──
     match /orders/{orderId} {
-      allow create: if request.auth != null;
-      allow read: if request.auth != null;
-      allow update: if request.auth != null;
+      // Customers can only read their own orders
+      allow read: if request.auth != null
+                  && request.auth.uid == resource.data.userId;
+
+      // Authenticated user can create order for themselves
+      allow create: if request.auth != null
+                    && request.auth.uid == request.resource.data.userId;
+
+      // Customers can UPDATE (cancel) only their own order,
+      // and only the status / cancelReason / cancelledAt fields,
+      // and only when transitioning to "Cancelled" from a cancellable status.
+      allow update: if request.auth != null
+                    && request.auth.uid == resource.data.userId
+                    && resource.data.status in ["Pending", "Preparing"]
+                    && request.resource.data.status == "Cancelled"
+                    // Prevent tampering with other sensitive fields
+                    && request.resource.data.userId   == resource.data.userId
+                    && request.resource.data.total    == resource.data.total
+                    && request.resource.data.items    == resource.data.items;
+
+      // Admins can read & write all orders (requires custom claim: admin=true)
+      allow read, write: if request.auth != null
+                          && request.auth.token.admin == true;
     }
   }
 }
